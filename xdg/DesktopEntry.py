@@ -302,7 +302,7 @@ class DesktopEntry(IniFile):
 
         elif key == "URL":
             self.checkValue(key, value)
-            self.checkType(key, "URL")
+            self.checkType(key, "Link")
 
         # kde extensions
         elif key == "ServiceTypes":
