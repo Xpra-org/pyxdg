@@ -9,5 +9,7 @@ Icon Themes
 
 .. autofunction:: getIconData
 
+.. autofunction:: get_themes
+
 .. autoclass:: IconData
    :members: getDisplayName, getEmbeddedTextRectangle, getAttachPoints

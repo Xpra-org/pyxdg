@@ -286,7 +286,7 @@ def getIconPath(iconname, size = None, theme = None, extensions = ["png", "svg",
 
     # parse theme files
     if (themes == []) or (themes[0].name != theme):
-        themes = list(__get_themes(theme))
+        themes = list(get_themes(theme))
 
     # more caching (icon looked up in the last 5 seconds?)
     tmp = (iconname, size, theme, tuple(extensions))
@@ -348,7 +348,7 @@ def getIconData(path):
             data.parse(icon_file)
             return data
 
-def __get_themes(themename):
+def get_themes(themename):
     """Generator yielding IconTheme objects for a specified theme and any themes
     from which it inherits.
     """
@@ -368,8 +368,10 @@ def __get_themes(themename):
     theme.parse(theme_file)
     yield theme
     for subtheme in theme.getInherits():
-        for t in __get_themes(subtheme):
-            yield t
+        yield from get_themes(subtheme)
+
+# Backwards-compatible alias for the old private name.
+__get_themes = get_themes
 
 def LookupIcon(iconname, size, theme, extensions):
     # look for the cache

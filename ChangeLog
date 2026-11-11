@@ -9,6 +9,8 @@ Version 0.29 (June 2022)
       (xdg.xdg_config_home() etc.), from upstream PR #19.
     * Mime: Add MIMEtype.get_icon() and MIMEtype.get_generic_icon(), based on
       upstream PR #10.
+    * IconTheme: Make get_themes() public (the old __get_themes name
+      is kept as an alias).
 
 Version 0.28 (June 2022)
 
