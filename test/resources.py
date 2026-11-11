@@ -2,7 +2,6 @@
 """This file contains sample data for the test suite - these are
 written out to temporary files for the relevant tests.
 """
-from __future__ import unicode_literals
 
 import sys
 

@@ -6,10 +6,7 @@ import unittest
 import tempfile, shutil
 import stat
 
-try:
-    reload
-except NameError:
-    from imp import reload
+from importlib import reload
 
 class BaseDirectoryTest(unittest.TestCase):
     def setUp(self):

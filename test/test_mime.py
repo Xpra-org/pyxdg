@@ -266,7 +266,12 @@ class MagicDBTest(MimeTestBase):
         data = b'PK\x03\x04' + (b' ' * 26) + b'mimetype' + b'image/openraster'
         res = self.magic.match_data(data)
         self.check_mimetype(res, 'image', 'openraster')
-    
+
+    def test_match_masked(self):
+        rule = Mime.MagicRule(start=0, value=b'\x10', mask=b'\xf0', word=1, range=1)
+        assert rule.match0(b'\x1f')
+        assert not rule.match0(b'\x2f')
+
     def test_match_file(self):
         png_file = os.path.join(self.tmpdir, 'image')
         with open(png_file, 'wb') as f:

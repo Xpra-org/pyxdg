@@ -22,7 +22,6 @@ information about the format of these files.
 import os
 import re
 import stat
-import sys
 import fnmatch
 
 from xdg import BaseDirectory
@@ -39,8 +38,6 @@ exts = None     # Maps extensions to types
 globs = None    # List of (glob, type) pairs
 literals = None # Maps liternal names to types
 magic = None
-
-PY3 = (sys.version_info[0] >= 3)
 
 def _get_node_data(node):
     """Get text of XML node"""
@@ -170,10 +167,7 @@ class MagicRule:
             raise DiscardMagicRules
         
         # value length (2 bytes, big endian)
-        if sys.version_info[0] >= 3:
-            lenvalue = int.from_bytes(line[:2], byteorder='big')
-        else:
-            lenvalue = (ord(line[0])<<8)+ord(line[1])
+        lenvalue = int.from_bytes(line[:2], byteorder='big')
         line = line[2:]
         
         # value
@@ -225,13 +219,7 @@ class MagicRule:
             if l<e:
                 return False
             if self.mask:
-                test=''
-                for i in range(lenvalue):
-                    if PY3:
-                        c = buffer[s+i] & self.mask[i]
-                    else:
-                        c = ord(buffer[s+i]) & ord(self.mask[i])
-                    test += chr(c)
+                test = bytes(buffer[s+i] & self.mask[i] for i in range(lenvalue))
             else:
                 test = buffer[s:e]
 
@@ -709,13 +697,8 @@ def is_text_file(path):
     with f:
         return _is_text(f.read(32))
 
-if PY3:
-    def _is_text(data):
-        return not any(b <= 0x8 or 0xe <= b < 0x20 or b == 0x7f for b in data)
-else:
-    def _is_text(data):
-        return not any(b <= '\x08' or '\x0e' <= b < '\x20' or b == '\x7f' \
-                            for b in data)
+def _is_text(data):
+    return not any(b <= 0x8 or 0xe <= b < 0x20 or b == 0x7f for b in data)
 
 _mime2ext_cache = None
 _mime2ext_cache_uptodate = False

@@ -9,10 +9,10 @@ from xdg.Menu import parse, Menu, MenuEntry
 def print_menu(menu, tab=0):
   for submenu in menu.Entries:
     if isinstance(submenu, Menu):
-      print ("\t" * tab) + unicode(submenu)
+      print("\t" * tab + str(submenu))
       print_menu(submenu, tab+1)
     elif isinstance(submenu, MenuEntry):
-      print ("\t" * tab) + unicode(submenu.DesktopEntry)
+      print("\t" * tab + str(submenu.DesktopEntry))
 
 print_menu(parse())
 """
@@ -21,40 +21,18 @@ import os
 import locale
 import subprocess
 import ast
-import sys
-try:
-    import xml.etree.cElementTree as etree
-except ImportError:
-    import xml.etree.ElementTree as etree
+import xml.etree.ElementTree as etree
 
 from xdg.BaseDirectory import xdg_data_dirs, xdg_config_dirs
 from xdg.DesktopEntry import DesktopEntry
 from xdg.Exceptions import ParsingError
-from xdg.util import PY3
 
 import xdg.Locale
 import xdg.Config
 
 
 def _ast_const(name):
-    if sys.version_info >= (3, 4):
-        name = ast.literal_eval(name)
-        if sys.version_info >= (3, 8):
-            return ast.Constant(name)
-        else:
-            return ast.NameConstant(name)
-    else:
-        return ast.Name(id=name, ctx=ast.Load())
-
-
-def _strxfrm(s):
-    """Wrapper around locale.strxfrm that accepts unicode strings on Python 2.
-
-    See Python bug #2481.
-    """
-    if (not PY3) and isinstance(s, unicode):
-        s = s.encode('utf-8')
-    return locale.strxfrm(s)
+    return ast.Constant(ast.literal_eval(name))
 
 
 DELETED = "Deleted"
@@ -140,7 +118,7 @@ class Menu:
 
     def _key(self):
         """Key function for locale-aware sorting."""
-        return _strxfrm(self.getName())
+        return locale.strxfrm(self.getName())
 
     def __lt__(self, other):
         try:
@@ -150,10 +128,7 @@ class Menu:
         return self._key() < other
 
     def __eq__(self, other):
-        try:
-            return self.Name == unicode(other)
-        except NameError:  # unicode() becomes str() in Python 3
-            return self.Name == str(other)
+        return self.Name == str(other)
 
     """ PUBLIC STUFF """
     def getEntries(self, show_hidden=False):
@@ -411,15 +386,14 @@ class Rule:
     def fromFilename(cls, type, filename):
         tree = ast.Expression(
             body=ast.Compare(
-                left=ast.Str(filename),
+                left=ast.Constant(filename),
                 ops=[ast.Eq()],
                 comparators=[ast.Attribute(
                     value=ast.Name(id='menuentry', ctx=ast.Load()),
                     attr='DesktopFileID',
                     ctx=ast.Load()
                 )]
-            ),
-            lineno=1, col_offset=0
+            )
         )
         ast.fix_missing_locations(tree)
         rule = Rule(type, tree)
@@ -528,7 +502,7 @@ class MenuEntry:
 
     def _key(self):
         """Key function for locale-aware sorting."""
-        return _strxfrm(self.DesktopEntry.getName())
+        return locale.strxfrm(self.DesktopEntry.getName())
 
     def __lt__(self, other):
         try:
@@ -763,12 +737,8 @@ class XMLMenuBuilder(object):
 
     def parse_rule(self, node):
         type = Rule.TYPE_INCLUDE if node.tag == 'Include' else Rule.TYPE_EXCLUDE
-        tree = ast.Expression(lineno=1, col_offset=0)
         expr = self.parse_bool_op(node, ast.Or())
-        if expr:
-            tree.body = expr
-        else:
-            tree.body = _ast_const('False')
+        tree = ast.Expression(body=expr or _ast_const('False'))
         ast.fix_missing_locations(tree)
         return Rule(type, tree)
 
@@ -799,7 +769,7 @@ class XMLMenuBuilder(object):
         elif tag == 'Category':
             category = node.text
             return ast.Compare(
-                left=ast.Str(category),
+                left=ast.Constant(category),
                 ops=[ast.In()],
                 comparators=[ast.Attribute(
                     value=ast.Name(id='menuentry', ctx=ast.Load()),
@@ -810,7 +780,7 @@ class XMLMenuBuilder(object):
         elif tag == 'Filename':
             filename = node.text
             return ast.Compare(
-                left=ast.Str(filename),
+                left=ast.Constant(filename),
                 ops=[ast.Eq()],
                 comparators=[ast.Attribute(
                     value=ast.Name(id='menuentry', ctx=ast.Load()),

@@ -2,12 +2,11 @@
 Base Class for DesktopEntry, IconTheme and IconData
 """
 
-import re, os, stat, io
+import re, os, stat
 from xdg.Exceptions import (ParsingError, DuplicateGroupError, NoGroupError,
                             NoKeyError, DuplicateKeyError, ValidationError,
                             debug)
 import xdg.Locale
-from xdg.util import u
 
 def is_ascii(s):
     """Return True if a string consists entirely of ASCII characters."""
@@ -48,7 +47,7 @@ class IniFile:
             # The content should be UTF-8, but legacy files can have other
             # encodings, including mixed encodings in one file. We don't attempt
             # to decode them, but we silence the errors.
-            fd = io.open(filename, 'r', encoding='utf-8', errors='replace')
+            fd = open(filename, 'r', encoding='utf-8', errors='replace')
         except IOError as e:
             if debug:
                 raise e
@@ -315,26 +314,26 @@ class IniFile:
         if os.path.dirname(filename) and not os.path.isdir(os.path.dirname(filename)):
             os.makedirs(os.path.dirname(filename))
 
-        with io.open(filename, 'w', encoding='utf-8') as fp:
+        with open(filename, 'w', encoding='utf-8') as fp:
 
             # An executable bit signifies that the desktop file is
             # trusted, but then the file can be executed. Add hashbang to
             # make sure that the file is opened by something that
             # understands desktop files.
             if trusted:
-                fp.write(u("#!/usr/bin/env xdg-open\n"))
+                fp.write("#!/usr/bin/env xdg-open\n")
 
             if self.defaultGroup:
-                fp.write(u("[%s]\n") % self.defaultGroup)
+                fp.write("[%s]\n" % self.defaultGroup)
                 for (key, value) in self.content[self.defaultGroup].items():
-                    fp.write(u("%s=%s\n") % (key, value))
-                fp.write(u("\n"))
+                    fp.write("%s=%s\n" % (key, value))
+                fp.write("\n")
             for (name, group) in self.content.items():
                 if name != self.defaultGroup:
-                    fp.write(u("[%s]\n") % name)
+                    fp.write("[%s]\n" % name)
                     for (key, value) in group.items():
-                        fp.write(u("%s=%s\n") % (key, value))
-                    fp.write(u("\n"))
+                        fp.write("%s=%s\n" % (key, value))
+                    fp.write("\n")
 
         # Add executable bits to the file to show that it's trusted.
         if trusted:

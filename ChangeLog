@@ -2,6 +2,9 @@ Version 0.29 (June 2022)
 
     * Drop support for Python 2 (only Python 3.2 and greater are supported)
     * BaseDirectory: Suppress error caused by a race condition when directories already exist.
+    * Require Python 3.10 or later; test against Python 3.10 to 3.15.
+    * Menu: Fix parsing on Python 3.12+ (ast.Str was removed).
+    * Mime: Fix masked magic rules, which never matched on Python 3.
 
 Version 0.28 (June 2022)
 

@@ -3,7 +3,6 @@
 
 Syntax: ./fuzz-mime.py /dir/to/test/
 """
-from __future__ import print_function
 
 import sys, os
 from xdg import Mime

@@ -2,11 +2,9 @@
 # coding: utf-8
 from xdg.DesktopEntry import DesktopEntry
 from xdg.Exceptions import ValidationError, ParsingError, NoKeyError
-from xdg.util import u
 
 import resources
 
-import io
 import os
 import shutil
 import re
@@ -17,7 +15,7 @@ class DesktopEntryTest(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
         self.test_file = os.path.join(self.tmpdir, "gedit.desktop")
-        with io.open(self.test_file, "w", encoding='utf-8') as f:
+        with open(self.test_file, "w", encoding='utf-8') as f:
             f.write(resources.gedit_desktop)
     
     def tearDown(self):
@@ -33,7 +31,7 @@ class DesktopEntryTest(unittest.TestCase):
         new_file = os.path.join(self.tmpdir, "test.desktop")
         de.write(new_file, trusted=True)
         
-        with io.open(new_file, encoding='utf-8') as f:
+        with open(new_file, encoding='utf-8') as f:
             contents = f.read()
         
         assert "[Hallo]" in contents, contents
@@ -72,22 +70,22 @@ class DesktopEntryTest(unittest.TestCase):
         assert not entry.hasGroup("Desktop Action Door")
     
     def test_unicode_name(self):
-        with io.open(self.test_file, "w", encoding='utf-8') as f:
+        with open(self.test_file, "w", encoding='utf-8') as f:
             f.write(resources.unicode_desktop)
         
         entry = DesktopEntry(self.test_file)
-        self.assertEqual(entry.getName(), u('Abc€þ'))
+        self.assertEqual(entry.getName(), 'Abc€þ')
     
     def test_invalid(self):
         test_file = os.path.join(self.tmpdir, "spout.desktop")
-        with io.open(test_file, "w", encoding='utf-8') as f:
+        with open(test_file, "w", encoding='utf-8') as f:
             f.write(resources.spout_desktop)
         
         self.assertRaises(ParsingError, DesktopEntry, test_file)
 
     def test_invalid_unicode(self):
         test_file = os.path.join(self.tmpdir, "gnome-alsamixer.desktop")
-        with io.open(test_file, "w", encoding='latin-1') as f:
+        with open(test_file, "w", encoding='latin-1') as f:
             f.write(resources.gnome_alsamixer_desktop)
         
         # Just check this doesn't throw a UnicodeError.
@@ -99,7 +97,7 @@ class TestTryExec(unittest.TestCase):
         self.test_file = os.path.join(self.tmpdir, "foo.desktop")
 
     def test_present(self):
-        with io.open(self.test_file, "w", encoding='utf-8') as f:
+        with open(self.test_file, "w", encoding='utf-8') as f:
             f.write(resources.python_desktop)
         
         entry = DesktopEntry(self.test_file)
@@ -107,7 +105,7 @@ class TestTryExec(unittest.TestCase):
         assert res, repr(res)
 
     def test_absent(self):
-        with io.open(self.test_file, "w", encoding='utf-8') as f:
+        with open(self.test_file, "w", encoding='utf-8') as f:
             f.write(resources.unicode_desktop)
         
         entry = DesktopEntry(self.test_file)
@@ -115,7 +113,7 @@ class TestTryExec(unittest.TestCase):
         assert res is None, repr(res)
         
     def test_no_TryExec(self):
-        with io.open(self.test_file, "w", encoding='utf-8') as f:
+        with open(self.test_file, "w", encoding='utf-8') as f:
             f.write(resources.gedit_desktop)
         
         entry = DesktopEntry(self.test_file)

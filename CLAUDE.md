@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PyXDG: pure-Python implementations of freedesktop.org specs (basedir, desktop entry, menu, icon theme, shared MIME-info, recent files). No runtime dependencies. Python 3 only (`python_requires=">=3.2"`; Python 2 support was dropped in 0.29, though some `PY3` / `u()` compatibility shims in `xdg/util.py` remain).
+PyXDG: pure-Python implementations of freedesktop.org specs (basedir, desktop entry, menu, icon theme, shared MIME-info, recent files). No runtime dependencies. Supports Python 3.10 to 3.15 (`python_requires=">=3.10"`, CI matrix in `.github/workflows/test.yml`). `xdg/util.py` (`PY3`, `u()`, `which`) is a deprecated shim kept only for external callers; don't use it internally.
 
 This is the Xpra-org fork (`origin`); the original project is `upstream` (takluyver/pyxdg).
 
@@ -27,9 +27,7 @@ python -m pytest --rootdir=. -c /dev/null test/test_*.py
 
 `test/fuzz-mime.py` and `test/menu-spec/` are standalone scripts, not pytest tests.
 
-Known breakage on Python 3.12+ (CI only tests up to 3.10):
-- `test/test_basedirectory.py` falls back to `from imp import reload`. The `imp` module was removed in 3.12; use `importlib.reload`.
-- `xdg/Menu.py` builds rule ASTs with `ast.Str` (removed in 3.12), so menu parsing and `Rule` compilation raise `AttributeError`. Use `ast.Constant`.
+`xdg/Menu.py` compiles menu `<Include>`/`<Exclude>` rules into Python ASTs. Build nodes with `ast.Constant` and pass required fields to the constructors (`ast.Expression(body=...)`); Python 3.15 rejects missing or unknown constructor arguments.
 
 ## Architecture
 

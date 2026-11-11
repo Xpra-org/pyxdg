@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-from __future__ import print_function
 
-import io
 import os
 import os.path
 import shutil
@@ -62,7 +60,7 @@ class MenuTest(unittest.TestCase):
 
     def test_parse_layout(self):
         test_file = os.path.join(self.tmpdir, "layout.menu")
-        with io.open(test_file, "w") as f:
+        with open(test_file, "w") as f:
             f.write(resources.layout_menu)
         menu = xdg.Menu.parse(test_file)
         show_menu(menu)
@@ -76,7 +74,7 @@ class MenuTest(unittest.TestCase):
 
     def test_unicode_menuentry(self):
         test_file = os.path.join(self.tmpdir, "unicode.desktop")
-        with io.open(test_file, 'w', encoding='utf-8') as f:
+        with open(test_file, 'w', encoding='utf-8') as f:
             f.write(resources.unicode_desktop)
 
         entry = xdg.Menu.MenuEntry(test_file)
