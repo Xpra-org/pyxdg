@@ -1,4 +1,4 @@
-Version 0.29 (June 2022)
+Version 0.29 (November 2026)
 
     * Drop support for Python 2 (only Python 3.2 and greater are supported)
     * BaseDirectory: Suppress error caused by a race condition when directories already exist.
