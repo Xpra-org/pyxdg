@@ -19,13 +19,7 @@ make -C docs html                        # Sphinx docs (docs/*.rst, published on
 
 There is no linter configuration.
 
-The repo has no pytest config of its own. On this machine, pytest walks up and picks `~/pyproject.toml` (an unrelated Pillow config) as its config file, so bare `pytest` breaks during collection (it imports `setup.py`). Run the suite in isolation:
-
-```sh
-python -m pytest --rootdir=. -c /dev/null test/test_*.py
-```
-
-`test/fuzz-mime.py` and `test/menu-spec/` are standalone scripts, not pytest tests.
+pytest is configured in `pyproject.toml`. Its `pythonpath = ["."]` makes tests import the local `xdg/` package rather than a system-installed pyxdg. It also disables the `pytest-relaxed` plugin, because that plugin would collect the standalone scripts `test/fuzz-mime.py` and `test/menu-spec/`, which are not pytest tests.
 
 `xdg/Menu.py` compiles menu `<Include>`/`<Exclude>` rules into Python ASTs. Build nodes with `ast.Constant` and pass required fields to the constructors (`ast.Expression(body=...)`); Python 3.15 rejects missing or unknown constructor arguments.
 

@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+# Disable the pytest-relaxed plugin if installed: it collects every .py file
+# in test/, including the standalone fuzz-mime.py and menu-spec scripts.
+addopts = "-p no:relaxed"
+testpaths = ["test"]
+pythonpath = ["."]
+python_files = ["test_*.py"]
