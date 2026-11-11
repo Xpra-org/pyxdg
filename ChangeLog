@@ -5,6 +5,8 @@ Version 0.29 (June 2022)
     * Require Python 3.10 or later; test against Python 3.10 to 3.15.
     * Menu: Fix parsing on Python 3.12+ (ast.Str was removed).
     * Mime: Fix masked magic rules, which never matched on Python 3.
+    * Add pathlib-based functions matching the srstevenson/xdg API
+      (xdg.xdg_config_home() etc.), from upstream PR #19.
 
 Version 0.28 (June 2022)
 

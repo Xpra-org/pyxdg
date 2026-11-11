@@ -66,3 +66,30 @@ Runtime directory
 .. autofunction:: get_runtime_dir
 
    .. versionadded:: 0.25
+
+pathlib API
+-----------
+
+.. currentmodule:: xdg
+
+These functions in the top-level :mod:`xdg` package return the base directories
+as :class:`pathlib.Path` objects. They match the API of the
+`xdg <https://github.com/srstevenson/xdg>`_ package. Unlike the values above,
+they read the environment each time they are called. Empty variables are
+treated as unset, and relative paths are ignored, as the specification requires.
+:func:`xdg_config_dirs` and :func:`xdg_data_dirs` do not include the
+corresponding ``*_HOME`` directory.
+
+.. autofunction:: xdg_cache_home
+
+.. autofunction:: xdg_config_home
+
+.. autofunction:: xdg_config_dirs
+
+.. autofunction:: xdg_data_home
+
+.. autofunction:: xdg_data_dirs
+
+.. autofunction:: xdg_state_home
+
+.. autofunction:: xdg_runtime_dir
