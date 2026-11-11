@@ -46,6 +46,10 @@ MIMEtype objects
       e.g. 'plain'
       
    .. automethod:: get_comment
+
+   .. automethod:: get_icon
+
+   .. automethod:: get_generic_icon
    
    .. versionadded:: 0.25
       :meth:`MIMEtype.canonical` and :meth:`MIMEtype.inherits_from`.

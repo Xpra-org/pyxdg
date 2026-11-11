@@ -407,3 +407,50 @@ class GlobsParsingTest(MimeTestBase):
         self.assertEqual(ag[_l('text', 'x-c++src')], set([(50, '*.C', ('cs',))]) )
         self.assertEqual(ag[_l('text', 'x-readme')], set([(20, 'RDME', ('cs',))]) )
         assert _l('text', 'x-python') not in ag, ag
+
+
+class MimeIconTest(unittest.TestCase):
+    def setUp(self):
+        from unittest import mock
+        from xdg import BaseDirectory
+        self.user_dir = tempfile.mkdtemp()
+        self.system_dir = tempfile.mkdtemp()
+        self.write(self.user_dir, 'icons', 'text/x-foo:user-foo-icon\n')
+        self.write(self.system_dir, 'icons',
+                   'text/x-foo:system-foo-icon\ntext/x-bar:bar-icon\nmalformed\n')
+        self.write(self.system_dir, 'generic-icons', 'text/x-foo:foo-generic\n')
+        patcher = mock.patch.object(BaseDirectory, 'xdg_data_dirs',
+                                    [self.user_dir, self.system_dir])
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        Mime._icons_cache = None
+        self.addCleanup(setattr, Mime, '_icons_cache', None)
+
+    def tearDown(self):
+        shutil.rmtree(self.user_dir)
+        shutil.rmtree(self.system_dir)
+
+    @staticmethod
+    def write(base, name, contents):
+        os.makedirs(os.path.join(base, 'mime'), exist_ok=True)
+        with open(os.path.join(base, 'mime', name), 'w') as f:
+            f.write(contents)
+
+    def test_get_icon(self):
+        # The first directory in the search path wins.
+        self.assertEqual(Mime.lookup('text/x-foo').get_icon(), 'user-foo-icon')
+        self.assertEqual(Mime.lookup('text/x-bar').get_icon(), 'bar-icon')
+        # Default from the spec: replace '/' with '-'.
+        self.assertEqual(Mime.lookup('text/x-baz').get_icon(), 'text-x-baz')
+
+    def test_get_generic_icon(self):
+        self.assertEqual(Mime.lookup('text/x-foo').get_generic_icon(), 'foo-generic')
+        # Default from the spec: media type + '-x-generic'.
+        self.assertEqual(Mime.lookup('text/x-bar').get_generic_icon(), 'text-x-generic')
+        self.assertEqual(Mime.lookup('image/x-baz').get_generic_icon(), 'image-x-generic')
+
+    def test_icon_does_not_load_comment(self):
+        # Upstream PR #10 crashed when get_icon() was called before get_comment().
+        mt = Mime.lookup('text/x-foo')
+        mt.get_icon()
+        self.assertEqual(mt.get_comment(), 'text/x-foo')

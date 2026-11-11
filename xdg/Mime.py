@@ -98,7 +98,6 @@ class MIMEtype(object):
                     self._comment = (goodness, _get_node_data(comment))
                 if goodness == 2: return
 
-    # FIXME: add get_icon method
     def get_comment(self):
         """Returns comment for current language, loading it if needed."""
         # Should we ever reload?
@@ -106,7 +105,29 @@ class MIMEtype(object):
             self._comment = (0, str(self))
             self._load()
         return self._comment[1]
-    
+
+    def get_icon(self):
+        """Returns the name of the icon for this type.
+
+        This is the icon declared in the shared MIME database, or the default
+        name from the specification: the type with ``/`` replaced by ``-``
+        (e.g. ``text-x-python``).
+
+        .. versionadded:: 0.29
+        """
+        return _get_icons()[0].get(str(self)) or self.media + '-' + self.subtype
+
+    def get_generic_icon(self):
+        """Returns the name of the generic icon for this type.
+
+        This is the generic icon declared in the shared MIME database, or the
+        default name from the specification: the media type followed by
+        ``-x-generic`` (e.g. ``text-x-generic``).
+
+        .. versionadded:: 0.29
+        """
+        return _get_icons()[1].get(str(self)) or self.media + '-x-generic'
+
     def canonical(self):
         """Returns the canonical MimeType object if this is an alias."""
         update_cache()
@@ -524,10 +545,36 @@ app_exe = lookup('application', 'executable')
 
 _cache_uptodate = False
 
+_icons_cache = None
+
+def _load_icon_file(name):
+    """Read a ``mime/icons`` style file (``type:icon-name`` per line).
+
+    Directories earlier in the search path take precedence."""
+    icons = {}
+    for path in BaseDirectory.load_data_paths(os.path.join('mime', name)):
+        with open(path, 'r') as f:
+            for line in f:
+                mtype, sep, icon = line.strip().partition(':')
+                if sep and icon:
+                    icons.setdefault(mtype, icon)
+    return icons
+
+def _get_icons():
+    """Returns (icons, generic_icons) dicts, loading them on first use.
+
+    These are kept separate from the main cache so that code which never
+    asks for icons does not pay for reading them."""
+    global _icons_cache
+    if _icons_cache is None:
+        _icons_cache = (_load_icon_file('icons'), _load_icon_file('generic-icons'))
+    return _icons_cache
+
 def _cache_database():
-    global globs, magic, aliases, inheritance, _cache_uptodate
+    global globs, magic, aliases, inheritance, _cache_uptodate, _icons_cache
 
     _cache_uptodate = True
+    _icons_cache = None
 
     aliases = {}    # Maps alias Mime types to canonical names
     inheritance = defaultdict(set) # Maps to sets of parent mime types.
