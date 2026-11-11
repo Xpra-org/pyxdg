@@ -11,6 +11,7 @@ Version 0.29 (June 2022)
       upstream PR #10.
     * IconTheme: Make get_themes() public (the old __get_themes name
       is kept as an alias).
+    * IconTheme: Add clear_cache() to reset the icon lookup caches.
 
 Version 0.28 (June 2022)
 

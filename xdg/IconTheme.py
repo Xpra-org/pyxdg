@@ -251,6 +251,18 @@ theme_cache = {}
 dir_cache = {}
 icon_cache = {}
 
+def clear_cache():
+    """Clear all cached icon lookup data: the parsed themes and the theme,
+    directory and icon caches.
+
+    Use this after icons or themes change on disk, or when the icon theme
+    configuration changes, to force fresh lookups.
+    """
+    themes.clear()
+    theme_cache.clear()
+    dir_cache.clear()
+    icon_cache.clear()
+
 def getIconPath(iconname, size = None, theme = None, extensions = ["png", "svg", "xpm"]):
     """Get the path to a specified icon.
     

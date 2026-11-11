@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from xdg.IconTheme import IconTheme, getIconPath, getIconData
+from xdg import IconTheme as IconThemeModule
+from xdg.IconTheme import IconTheme, getIconPath, getIconData, clear_cache
 import tempfile, shutil, os
 import unittest
 
@@ -22,6 +23,15 @@ class IconThemeTest(unittest.TestCase):
         theme = IconTheme()
         theme.parse(example_file("index.theme"))
         theme.validate()
+
+    def test_clear_cache(self):
+        getIconPath("oijeorjewrjkngjhbqefew")
+        assert IconThemeModule.dir_cache or IconThemeModule.icon_cache or not IconThemeModule.icondirs
+        clear_cache()
+        assert IconThemeModule.themes == []
+        assert IconThemeModule.theme_cache == {}
+        assert IconThemeModule.dir_cache == {}
+        assert IconThemeModule.icon_cache == {}
 
 class IconDataTest(unittest.TestCase):
     def test_read_icon_data(self):

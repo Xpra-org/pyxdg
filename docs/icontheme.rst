@@ -11,5 +11,7 @@ Icon Themes
 
 .. autofunction:: get_themes
 
+.. autofunction:: clear_cache
+
 .. autoclass:: IconData
    :members: getDisplayName, getEmbeddedTextRectangle, getAttachPoints
