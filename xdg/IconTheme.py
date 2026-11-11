@@ -432,7 +432,7 @@ def DirectoryMatchesSize(subdir, iconsize, theme):
     MaxSize = theme.getMaxSize(subdir)
     if Type == "Fixed":
         return Size == iconsize
-    elif Type == "Scaleable":
+    elif Type == "Scalable":
         return MinSize <= iconsize <= MaxSize
     elif Type == "Threshold":
         return Size - Threshold <= iconsize <= Size + Threshold
