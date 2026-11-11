@@ -6,9 +6,9 @@ setup(
     name="pyxdg",
     version="0.29",
     description="PyXDG contains implementations of freedesktop.org standards in python.",
-    maintainer="Freedesktop.org",
-    maintainer_email="xdg@lists.freedesktop.org",
-    url="http://freedesktop.org/wiki/Software/pyxdg",
+    maintainer="Antoine Martin",
+    maintainer_email="totaam@xpra.org",
+    url="https://github.com/Xpra-org/pyxdg",
     packages=["xdg"],
     python_requires=">=3.2",
     classifiers=[
