@@ -38,4 +38,4 @@ Because so much state is module-level and fixed at import time, tests that chang
 
 ## Release notes
 
-When bumping the version, update `setup.py`, `xdg/__init__.py` (`__version__`), and `ChangeLog` together. They are currently out of sync: `setup.py` is at 0.29, `__init__.py` at 0.28.
+When bumping the version, update `setup.py`, `xdg/__init__.py` (`__version__`), and `ChangeLog` together.
