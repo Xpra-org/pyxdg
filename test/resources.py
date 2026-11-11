@@ -555,3 +555,25 @@ DisplayName=Mime text/plain
 EmbeddedTextRectangle=100,100,900,900
 AttachPoints=200,200|800,200|500,500|200,800|800,800
 """
+
+scalable_index_theme = """[Icon Theme]
+Name=Scalable Test
+Comment=Theme with scalable directories, for size matching tests
+Directories=small,big,fixed48
+
+[small]
+Size=16
+MinSize=8
+MaxSize=16
+Type=Scalable
+
+[big]
+Size=64
+MinSize=16
+MaxSize=256
+Type=Scalable
+
+[fixed48]
+Size=48
+Type=Fixed
+"""

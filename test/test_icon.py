@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from xdg import IconTheme as IconThemeModule
-from xdg.IconTheme import IconTheme, getIconPath, getIconData, clear_cache
+from xdg.IconTheme import (IconTheme, getIconPath, getIconData, clear_cache,
+                           DirectoryMatchesSize, DirectorySizeDistance, LookupIcon)
+from unittest import mock
 import tempfile, shutil, os
 import unittest
 
@@ -32,6 +34,55 @@ class IconThemeTest(unittest.TestCase):
         assert IconThemeModule.theme_cache == {}
         assert IconThemeModule.dir_cache == {}
         assert IconThemeModule.icon_cache == {}
+
+class ScalableDirectoryTest(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.themedir = os.path.join(self.tmpdir, "scalabletest")
+        os.mkdir(self.themedir)
+        theme_file = os.path.join(self.themedir, "index.theme")
+        with open(theme_file, "w") as f:
+            f.write(resources.scalable_index_theme)
+        self.theme = IconTheme()
+        self.theme.parse(theme_file)
+        clear_cache()
+
+    def tearDown(self):
+        clear_cache()
+        shutil.rmtree(self.tmpdir)
+
+    def test_scalable_matches_size(self):
+        assert DirectoryMatchesSize("big", 16, self.theme)
+        assert DirectoryMatchesSize("big", 100, self.theme)
+        assert DirectoryMatchesSize("big", 256, self.theme)
+        assert not DirectoryMatchesSize("big", 8, self.theme)
+        assert not DirectoryMatchesSize("big", 512, self.theme)
+
+    def test_scalable_size_distance(self):
+        self.assertEqual(DirectorySizeDistance("big", 100, self.theme), 0)
+        self.assertEqual(DirectorySizeDistance("big", 10, self.theme), 6)
+        self.assertEqual(DirectorySizeDistance("big", 300, self.theme), 44)
+        self.assertEqual(DirectorySizeDistance("small", 64, self.theme), 48)
+
+    def _add_icon(self, subdir, name="test-icon.svg"):
+        d = os.path.join(self.themedir, subdir)
+        os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, name), "w").close()
+        return os.path.join(d, name)
+
+    def test_lookup_uses_scalable_exact_match(self):
+        big = self._add_icon("big")
+        self._add_icon("fixed48", "test-icon.png")
+        with mock.patch.object(IconThemeModule, "icondirs", [self.tmpdir]):
+            # 100 is only in range for "big"; the fixed 48 dir is not exact
+            self.assertEqual(LookupIcon("test-icon", 100, self.theme, ["png", "svg"]), big)
+
+    def test_lookup_closest_above_max_size(self):
+        self._add_icon("small")
+        big = self._add_icon("big")
+        with mock.patch.object(IconThemeModule, "icondirs", [self.tmpdir]):
+            # 512 is above both MaxSizes; "big" (256) is closer than "small" (16)
+            self.assertEqual(LookupIcon("test-icon", 512, self.theme, ["svg"]), big)
 
 class IconDataTest(unittest.TestCase):
     def test_read_icon_data(self):

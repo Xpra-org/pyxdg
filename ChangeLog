@@ -14,6 +14,8 @@ Version 0.29 (June 2022)
     * IconTheme: Add clear_cache() to reset the icon lookup caches.
     * IconTheme: Fix scalable directories never matching the requested size
       exactly ("Scaleable" typo in DirectoryMatchesSize).
+    * IconTheme: Fix DirectorySizeDistance returning a negative distance for
+      scalable directories whose MaxSize is below the requested size.
 
 Version 0.28 (June 2022)
 
